@@ -98,29 +98,13 @@
     }];
 
     UIButton *task =
-    [self createButtonWithTitle:@"Task" andEventHandler:^{
-        NSRange selectionRange = self.selectedRange;
-        selectionRange.location += 7;
-        if (weakSelf.text.length == 0) {
-            [weakSelf insertText:@"- [ ] "];
-        }
-        else {
-            [weakSelf insertText:@"\n- [ ] "];
-        }
-        weakSelf.selectedRange = selectionRange;
+    [self createButtonWithTitle:@"List" andEventHandler:^{
+        [weakSelf insertListItemIfNeeded];
     }];
 
     UIButton *quote =
     [self createButtonWithTitle:@"Quote" andEventHandler:^{
-        NSRange selectionRange = self.selectedRange;
-        selectionRange.location += 3;
-        if (weakSelf.text.length == 0) {
-            [weakSelf insertText:@"> "];
-        }
-        else {
-            [weakSelf insertText:@"\n> "];
-        }
-        weakSelf.selectedRange = selectionRange;
+        [weakSelf insertOrPrependWithText:@">"];
     }];
     
 
@@ -225,5 +209,33 @@
     }];
 }
 
+static NSString* const listItemMarkup = @"- ";
+
+/// Attemps to find an existing list item markdown at the beginning of the line, if one is found no action needed. If one is not found a list item markdown will be inserted at the beginnign of th line
+-(void) insertListItemIfNeeded {
+    
+    NSUInteger caretLocation = self.selectedRange.location;
+    NSString *text = self.text;
+    NSUInteger caretLocationLineEnd = caretLocation;
+    while (caretLocationLineEnd < [text length] && [text characterAtIndex:caretLocationLineEnd] != '\n') {
+        caretLocationLineEnd++;
+    }
+    NSUInteger caretLocationLineStart = caretLocation;
+    while (caretLocationLineStart > 0) {
+        caretLocationLineStart--;
+        if (caretLocationLineStart > 1 && [text characterAtIndex:caretLocationLineEnd-1] == '\n') {
+            break;
+        }
+    }
+    NSRange caretLineRange = NSMakeRange(caretLocationLineStart, caretLocationLineEnd-caretLocationLineStart);
+    NSString *caretLineText = [text substringWithRange:caretLineRange];
+    if ([caretLineText hasPrefix:listItemMarkup]) {
+        return;
+    }
+    
+    self.text =
+        [text stringByReplacingCharactersInRange:caretLineRange
+                                      withString:[NSString stringWithFormat:@"%@%@",listItemMarkup,caretLineText]];
+ }
 
 @end

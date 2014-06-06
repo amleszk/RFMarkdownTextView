@@ -143,7 +143,7 @@
     return button;
 }
 
-#pragma mark - UITextView
+#pragma mark - UITextView overrides
 
 -(void) setDelegate:(id<UITextViewDelegate>)delegate {
     [super setDelegate:delegate];
@@ -186,13 +186,21 @@
     }];
 }
 
--(void) insertOrSurroundWithText:(NSString*)text {
-    [self insertText:text orWithSelectedText:^(UITextRange *selectedTextRange, NSString *selectedText) {
-        [self replaceRange:selectedTextRange withText:[NSString stringWithFormat:@"%@%@%@",text,selectedText,text]];
+-(void) insertOrSurroundWithText:(NSString*)textToSurround {
+    NSAssert([textToSurround length], @"Expected non empty string %@",self);
+    
+    [self insertText:textToSurround orWithSelectedText:^(UITextRange *selectedTextRange, NSString *selectedText) {
+        NSRange selectedRange = self.selectedRange;
+        [self replaceRange:selectedTextRange withText:[NSString stringWithFormat:@"%@%@%@",textToSurround,selectedText,textToSurround]];
+        
+        selectedRange.location += [textToSurround length];
+        self.selectedRange = selectedRange;
     }];
 }
 
 -(void) insertOrPrependWithText:(NSString*)textToPrepend {
+    NSAssert([textToPrepend length], @"Expected non empty string %@",self);
+    
     [self insertText:textToPrepend orWithSelectedText:^(UITextRange *selectedTextRange, NSString *selectedText) {
         
         //Selected range must be saved before replacing the text

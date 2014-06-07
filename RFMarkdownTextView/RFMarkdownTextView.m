@@ -211,9 +211,30 @@
 
 static NSString* const listItemMarkup = @"- ";
 
-/// Attemps to find an existing list item markdown at the beginning of the line, if one is found no action needed. If one is not found a list item markdown will be inserted at the beginnign of th line
+/// Find an existing list item markdown at the beginning of the line, if one is found no action needed. If one is not found a list item markdown will be inserted at the begining of the line
 -(void) insertListItemIfNeeded {
     
+    NSRange caretLineRange = [self getCaretLineRange];
+    NSString *caretLineText = [self.text substringWithRange:caretLineRange];
+    if ([caretLineText hasPrefix:listItemMarkup]) {
+        //No action
+    }
+    else if ([caretLineText length] == 0) {
+        [self insertText:listItemMarkup];
+    }
+    else { //Prepend the list item markup to this line
+        NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithAttributedString:self.attributedText];
+        [attrString replaceCharactersInRange:caretLineRange withString:[NSString stringWithFormat:@"%@%@",listItemMarkup,caretLineText]];
+        
+        self.attributedText = attrString;
+        [self textViewDidChange:self];
+        self.selectedRange = NSMakeRange(caretLineRange.location+[listItemMarkup length], 0);
+    }
+}
+
+/// Returns the line range of the current location of the caret, regardless of selection. If caret is at the beginning of a new line, length is zero
+-(NSRange) getCaretLineRange
+{
     NSUInteger caretLocation = self.selectedRange.location;
     NSString *text = self.text;
     NSUInteger caretLocationLineEnd = caretLocation;
@@ -222,20 +243,13 @@ static NSString* const listItemMarkup = @"- ";
     }
     NSUInteger caretLocationLineStart = caretLocation;
     while (caretLocationLineStart > 0) {
-        caretLocationLineStart--;
-        if (caretLocationLineStart > 1 && [text characterAtIndex:caretLocationLineEnd-1] == '\n') {
+        if (caretLocationLineStart > 1 && [text characterAtIndex:caretLocationLineStart-1] == '\n') {
             break;
         }
+        caretLocationLineStart--;
     }
     NSRange caretLineRange = NSMakeRange(caretLocationLineStart, caretLocationLineEnd-caretLocationLineStart);
-    NSString *caretLineText = [text substringWithRange:caretLineRange];
-    if ([caretLineText hasPrefix:listItemMarkup]) {
-        return;
-    }
-    
-    self.text =
-        [text stringByReplacingCharactersInRange:caretLineRange
-                                      withString:[NSString stringWithFormat:@"%@%@",listItemMarkup,caretLineText]];
- }
+    return caretLineRange;
+}
 
 @end

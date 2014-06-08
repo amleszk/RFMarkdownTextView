@@ -7,6 +7,7 @@
 //
 
 #import "RFMarkdownTextView.h"
+#import "UIPasteboard+RFMarkdown.h"
 
 @interface RFMarkdownTextView ()
 
@@ -69,32 +70,17 @@
 
     UIButton *link =
     [self createButtonWithTitle:@"Link" andEventHandler:^{
-        NSRange selectionRange = self.selectedRange;
-        selectionRange.location += 1;
-        [weakSelf insertText:@"[]()"];
-        weakSelf.selectedRange = selectionRange;
+        [weakSelf insertLinkMarkdown];
     }];
 
     UIButton *codeBlock =
     [self createButtonWithTitle:@"Codeblock" andEventHandler:^{
-        NSRange selectionRange = self.selectedRange;
-        if (weakSelf.text.length == 0) {
-            selectionRange.location += 3;
-            [weakSelf insertText:@"```\n```"];
-        }
-        else {
-            selectionRange.location += 4;
-            [weakSelf insertText:@"\n```\n```"];
-        }
-        weakSelf.selectedRange = selectionRange;
+        [weakSelf insertCodeBlockMarkdown];
     }];
 
     UIButton *image =
     [self createButtonWithTitle:@"Image" andEventHandler:^{
-        NSRange selectionRange = self.selectedRange;
-        selectionRange.location += 2;
-        [weakSelf insertText:@"![]()"];
-        weakSelf.selectedRange = selectionRange;
+        [weakSelf insertImageMarkdown];
     }];
 
     UIButton *task =
@@ -104,7 +90,7 @@
 
     UIButton *quote =
     [self createButtonWithTitle:@"Quote" andEventHandler:^{
-        [weakSelf insertOrPrependWithText:@">"];
+        [weakSelf insertQuoteItemIfNeeded];
     }];
     
 
@@ -142,6 +128,15 @@
 
 
 #pragma mark - Text handling
+
+#pragma mark Helpers
+
+-(void) offsetSelectionRange:(NSRange)selectionRange location:(NSUInteger)location length:(NSUInteger)length
+{
+    selectionRange.location += location;
+    selectionRange.length = length;
+    self.selectedRange = selectionRange;
+}
 
 -(void) withNoSelection:(void (^)(void))noSelectionBlock
       orWithSelectedText:(void (^)(UITextRange *selectedTextRange, NSString *selectedText))selectedTextBlock
@@ -209,26 +204,84 @@
     }];
 }
 
-static NSString* const listItemMarkup = @"- ";
+#pragma mark Links / Images
 
-/// Find an existing list item markdown at the beginning of the line, if one is found no action needed. If one is not found a list item markdown will be inserted at the begining of the line
--(void) insertListItemIfNeeded {
+-(void) insertImageMarkdown {
+    [self withNoSelection:^{
+        NSRange selectionRange = self.selectedRange;
+        [self insertText:@"[Alt Text](image.png)"];
+        [self offsetSelectionRange:selectionRange location:1 length:8];
+    } orWithSelectedText:^(UITextRange *selectedTextRange, NSString *selectedText) {
+        NSString *textWithLinkFormatting = [NSString stringWithFormat:@"[%@](image.png)",selectedText];
+        NSRange selectionRange = self.selectedRange;
+        [self replaceRange:selectedTextRange withText:textWithLinkFormatting];
+        NSUInteger newSelectionCaretLocationOffset = [textWithLinkFormatting length] - 1;
+        [self offsetSelectionRange:selectionRange location:newSelectionCaretLocationOffset length:0];
+    }];
+}
+
+static NSString* const markupURLStringExample = @"http://";
+
+/// When selected text, surround with link markdown, when no selected text insert an example and select it. In both cases if the user has copied a valid URL it will be populated in the link section
+-(void) insertLinkMarkdown {
+    __block NSString *pasteboardValidURLString = [[UIPasteboard generalPasteboard] validURLString];
+    
+    [self withNoSelection:^{
+        NSRange selectionRange = self.selectedRange;
+        [self insertText:[NSString stringWithFormat:@"[Click Here](%@)", pasteboardValidURLString ?: markupURLStringExample]];
+        [self offsetSelectionRange:selectionRange location:1 length:10];
+        
+    } orWithSelectedText:^(UITextRange *selectedTextRange, NSString *selectedText) {
+        NSString *textWithLinkFormatting = [NSString stringWithFormat:@"[%@](%@)",selectedText, pasteboardValidURLString ?: markupURLStringExample];
+        NSRange selectionRange = self.selectedRange;
+        [self replaceRange:selectedTextRange withText:textWithLinkFormatting];
+
+        if (pasteboardValidURLString == nil) {
+            NSUInteger newSelectionCaretLocationOffset = [textWithLinkFormatting length] - 1;
+            [self offsetSelectionRange:selectionRange location:newSelectionCaretLocationOffset length:0];
+        }
+
+    }];
+}
+
+#pragma mark Prepending to start of line
+
+static NSString* const codeMarkdown = @"    ";
+
+-(void) insertCodeBlockMarkdown{
+    [self insertFirstLineItemIfNeededWithMarkdownString:codeMarkdown];
+}
+
+static NSString* const listItemMarkdown = @"- ";
+
+-(void) insertListItemIfNeeded{
+    [self insertFirstLineItemIfNeededWithMarkdownString:listItemMarkdown];
+}
+
+static NSString* const quoteMarkdown = @"> ";
+
+-(void) insertQuoteItemIfNeeded{
+    [self insertFirstLineItemIfNeededWithMarkdownString:quoteMarkdown];
+}
+
+/// Find an existing first line item markdown at the beginning of the line, if one is found no action needed. If one is not found a list item markdown will be inserted at the begining of the line
+-(void) insertFirstLineItemIfNeededWithMarkdownString:(NSString*)markdownString {
     
     NSRange caretLineRange = [self getCaretLineRange];
     NSString *caretLineText = [self.text substringWithRange:caretLineRange];
-    if ([caretLineText hasPrefix:listItemMarkup]) {
+    if ([caretLineText hasPrefix:markdownString]) {
         //No action
     }
     else if ([caretLineText length] == 0) {
-        [self insertText:listItemMarkup];
+        [self insertText:listItemMarkdown];
     }
     else { //Prepend the list item markup to this line
         NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithAttributedString:self.attributedText];
-        [attrString replaceCharactersInRange:caretLineRange withString:[NSString stringWithFormat:@"%@%@",listItemMarkup,caretLineText]];
+        [attrString replaceCharactersInRange:caretLineRange withString:[NSString stringWithFormat:@"%@%@",markdownString,caretLineText]];
         
         self.attributedText = attrString;
         [self textViewDidChange:self];
-        self.selectedRange = NSMakeRange(caretLineRange.location+[listItemMarkup length], 0);
+        self.selectedRange = NSMakeRange(caretLineRange.location+[markdownString length], 0);
     }
 }
 
@@ -251,5 +304,7 @@ static NSString* const listItemMarkup = @"- ";
     NSRange caretLineRange = NSMakeRange(caretLocationLineStart, caretLocationLineEnd-caretLocationLineStart);
     return caretLineRange;
 }
+
+#pragma mark Code block
 
 @end

@@ -36,36 +36,42 @@
     self = [super initWithFrame:frame textContainer:container];
     if (self) {
         self.delegate = self;
-        self.inputAccessoryView = [RFKeyboardToolbar toolbarViewWithButtons:[self createMarkdownButtons]];
+        self.inputAccessoryView = [RFKeyboardToolbar toolbarViewWithButtons:[self createMarkdownButtonsForReddit]];
     }
     return self;
 }
 
-- (NSArray*) createMarkdownButtons {
+- (NSArray*) createMarkdownButtonsForReddit {
+    
     __weak typeof(self)weakSelf = self;
     UIButton *header =
     [self createButtonWithTitle:@"#" andEventHandler:^{
         [weakSelf insertOrPrependWithText:@"#"];
     }];
 
-    UIButton *boldItalics =
+    UIButton *bold =
+    [self createButtonWithTitle:@"**" andEventHandler:^{
+        [weakSelf insertOrSurroundWithText:@"**"];
+    }];
+    
+    UIButton *italics =
     [self createButtonWithTitle:@"*" andEventHandler:^{
         [weakSelf insertOrSurroundWithText:@"*"];
     }];
 
-    UIButton *underscore =
-    [self createButtonWithTitle:@"_" andEventHandler:^{
-        [weakSelf insertOrSurroundWithText:@"_"];
+    UIButton *strike =
+    [self createButtonWithTitle:@"~~" andEventHandler:^{
+        [weakSelf insertOrSurroundWithText:@"~~"];
     }];
 
     UIButton *code =
-    [self createButtonWithTitle:@"`" andEventHandler:^{
-        [weakSelf insertOrSurroundWithText:@"`"];
+    [self createButtonWithTitle:@"Code" andEventHandler:^{
+        [weakSelf insertCodeBlockMarkdownIfNeeded];
     }];
-
-    UIButton *mention =
-    [self createButtonWithTitle:@"@" andEventHandler:^{
-        [weakSelf insertOrPrependWithText:@"@"];
+    
+    UIButton *quote =
+    [self createButtonWithTitle:@"Quote" andEventHandler:^{
+        [weakSelf insertQuoteItemIfNeeded];
     }];
 
     UIButton *link =
@@ -73,37 +79,25 @@
         [weakSelf insertLinkMarkdown];
     }];
 
-    UIButton *codeBlock =
-    [self createButtonWithTitle:@"Codeblock" andEventHandler:^{
-        [weakSelf insertCodeBlockMarkdown];
-    }];
-
-    UIButton *image =
-    [self createButtonWithTitle:@"Image" andEventHandler:^{
-        [weakSelf insertImageMarkdown];
-    }];
-
-    UIButton *task =
-    [self createButtonWithTitle:@"List" andEventHandler:^{
+    UIButton *bullet =
+    [self createButtonWithTitle:@"Bullet" andEventHandler:^{
         [weakSelf insertListItemIfNeeded];
     }];
 
-    UIButton *quote =
-    [self createButtonWithTitle:@"Quote" andEventHandler:^{
-        [weakSelf insertQuoteItemIfNeeded];
+    UIButton *numbers =
+    [self createButtonWithTitle:@"Numbers" andEventHandler:^{
+        [weakSelf insertListItemIfNeeded];
     }];
-    
 
     return @[header,
-             boldItalics,
-             underscore,
+             bold,
+             italics,
+             strike,
+             quote,
              code,
-             mention,
              link,
-             codeBlock,
-             image,
-             task,
-             quote];
+             bullet,
+             numbers];
 }
 
 - (RFToolbarButton*)createButtonWithTitle:(NSString*)title andEventHandler:(void(^)())handler {
@@ -118,6 +112,16 @@
 -(void) setDelegate:(id<UITextViewDelegate>)delegate {
     [super setDelegate:delegate];
     NSAssert(delegate == self, @"Overriding UITextViewDelegate for %@",self);
+}
+
+-(void) setText:(NSString *)text {
+    [super setText:text];
+    [_syntaxStorage update];
+}
+
+-(void) setAttributedText:(NSAttributedString *)attributedText {
+    [super setAttributedText:attributedText];
+    [_syntaxStorage update];
 }
 
 #pragma mark - UITextViewDelegate
@@ -248,7 +252,7 @@ static NSString* const markupURLStringExample = @"http://";
 
 static NSString* const codeMarkdown = @"    ";
 
--(void) insertCodeBlockMarkdown{
+-(void) insertCodeBlockMarkdownIfNeeded{
     [self insertFirstLineItemIfNeededWithMarkdownString:codeMarkdown];
 }
 
@@ -257,6 +261,7 @@ static NSString* const listItemMarkdown = @"- ";
 -(void) insertListItemIfNeeded{
     [self insertFirstLineItemIfNeededWithMarkdownString:listItemMarkdown];
 }
+
 
 static NSString* const quoteMarkdown = @"> ";
 
@@ -280,7 +285,6 @@ static NSString* const quoteMarkdown = @"> ";
         [attrString replaceCharactersInRange:caretLineRange withString:[NSString stringWithFormat:@"%@%@",markdownString,caretLineText]];
         
         self.attributedText = attrString;
-        [self textViewDidChange:self];
         self.selectedRange = NSMakeRange(caretLineRange.location+[markdownString length], 0);
     }
 }

@@ -109,20 +109,25 @@
 
 #pragma mark - UITextView overrides
 
+-(NSAttributedString*) attributedText {
+    return [_syntaxStorage attributedString];
+}
+
 -(void) setDelegate:(id<UITextViewDelegate>)delegate {
     [super setDelegate:delegate];
     NSAssert(delegate == self, @"Overriding UITextViewDelegate for %@",self);
 }
 
--(void) setText:(NSString *)text {
-    [super setText:text];
-    [_syntaxStorage update];
+-(void) setAttributedText:(NSAttributedString *)attributedText {
+    _syntaxStorage = [RFMarkdownSyntaxStorage new];
+    NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:@"" attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:12]}];
+    [_syntaxStorage appendAttributedString:attrString];
+    [_syntaxStorage appendAttributedString:attributedText];
+    [_syntaxStorage setAttributedString:[[NSMutableAttributedString alloc] initWithAttributedString:attributedText]];
+    [_syntaxStorage addLayoutManager:self.layoutManager];
+    [super setAttributedText:attributedText];
 }
 
--(void) setAttributedText:(NSAttributedString *)attributedText {
-    [super setAttributedText:attributedText];
-    [_syntaxStorage update];
-}
 
 #pragma mark - UITextViewDelegate
 

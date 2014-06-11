@@ -23,7 +23,18 @@
     
     _textView = [[RFMarkdownTextView alloc] initWithFrame:self.view.bounds];
     
+    self.navigationItem.rightBarButtonItem =
+        [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
+                                                       target:self
+                                                       action:@selector(resetText)];
+
+    
     [self.view addSubview:_textView];
+}
+
+-(void) resetText
+{
+    _textView.text = @"";
 }
 
 - (void)didReceiveMemoryWarning

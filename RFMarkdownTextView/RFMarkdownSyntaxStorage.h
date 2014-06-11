@@ -10,6 +10,8 @@
 
 @interface RFMarkdownSyntaxStorage : NSTextStorage
 
+-(NSAttributedString *) attributedString;
+
 - (void)update;
 
 @end

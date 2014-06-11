@@ -7,7 +7,7 @@ Pod::Spec.new do |s|
   s.license      = 'MIT'
   s.license      = { :type => 'MIT', :file => 'LICENSE' }
   s.author       = { 'Rudd Fawcett' => 'rudd.fawcett@gmail.com' }
-  s.platform     = :ios, '7.0'
+  s.platform     = :ios, '8.0'
   s.source       = { :git => 'https://github.com/ruddfawcett/RFMarkdownTextView.git', :tag => 'v1.3' }
   s.source_files  = 'RFMarkdownTextView/*.{h,m}'
   s.requires_arc = true

@@ -86,7 +86,7 @@
 
     UIButton *numbers =
     [self createButtonWithTitle:@"Numbers" andEventHandler:^{
-        [weakSelf insertListItemIfNeeded];
+        [weakSelf insertNumberItemIfNeeded];
     }];
 
     return @[header,
@@ -108,6 +108,10 @@
 }
 
 #pragma mark - UITextView overrides
+
+-(NSString*) text {
+    return [[self attributedText] string];
+}
 
 -(NSAttributedString*) attributedText {
     return [_syntaxStorage attributedString];
@@ -268,6 +272,13 @@ static NSString* const listItemMarkdown = @"- ";
 }
 
 
+static NSString* const numberItemMarkdown = @"1. ";
+
+-(void) insertNumberItemIfNeeded{
+    [self insertFirstLineItemIfNeededWithMarkdownString:numberItemMarkdown];
+}
+
+
 static NSString* const quoteMarkdown = @"> ";
 
 -(void) insertQuoteItemIfNeeded{
@@ -283,7 +294,7 @@ static NSString* const quoteMarkdown = @"> ";
         //No action
     }
     else if ([caretLineText length] == 0) {
-        [self insertText:listItemMarkdown];
+        [self insertText:markdownString];
     }
     else { //Prepend the list item markup to this line
         NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithAttributedString:self.attributedText];

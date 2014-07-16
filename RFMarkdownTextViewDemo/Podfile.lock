@@ -1,10 +1,15 @@
 PODS:
-  - RFKeyboardToolbar (1.1)
+  - RFKeyboardToolbar (1.2)
 
 DEPENDENCIES:
-  - RFKeyboardToolbar (~> 1.1)
+  - RFKeyboardToolbar (from `https://github.com/amleszk/RFKeyboardToolbar`, commit `40ada111e3820438d973a31b9859169b17d000f5`)
+
+EXTERNAL SOURCES:
+  RFKeyboardToolbar:
+    :commit: 40ada111e3820438d973a31b9859169b17d000f5
+    :git: https://github.com/amleszk/RFKeyboardToolbar
 
 SPEC CHECKSUMS:
-  RFKeyboardToolbar: 091806a277436ba2917934d8878f58a771f2c8c7
+  RFKeyboardToolbar: 014234ddbe16af639b71a88aeecbd0cf8c80aba1
 
 COCOAPODS: 0.33.1

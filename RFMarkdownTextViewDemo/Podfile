@@ -1,2 +1,2 @@
 platform :ios, '7.0'
-pod "RFKeyboardToolbar", "~> 1.1"
+pod "RFKeyboardToolbar", :git => 'git://github.com/amleszk/RFKeyboardToolbar', :commit => '40ada111e3820438d973a31b9859169b17d000f5'

@@ -118,8 +118,11 @@
 }
 
 -(void) setDelegate:(id<UITextViewDelegate>)delegate {
-    [super setDelegate:delegate];
-    NSAssert(delegate == self, @"Overriding UITextViewDelegate for %@",self);
+    if (delegate) {
+        NSAssert(delegate == self, @"Overriding UITextViewDelegate for %@",self);
+    } else {
+        [super setDelegate:delegate];
+    }
 }
 
 -(void) setAttributedText:(NSAttributedString *)attributedText {

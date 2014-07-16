@@ -46,7 +46,7 @@
     __weak typeof(self)weakSelf = self;
     UIButton *header =
     [self createButtonWithTitle:@"#" andEventHandler:^{
-        [weakSelf insertOrPrependWithText:@"#"];
+        [weakSelf insertHeaderMarkdownIfNeeded];
     }];
 
     UIButton *bold =
@@ -262,38 +262,46 @@ static NSString* const markupURLStringExample = @"http://";
 
 #pragma mark Prepending to start of line
 
+static NSString* const headerMarkdown = @"#";
+
+-(void) insertHeaderMarkdownIfNeeded{
+    [self insertFirstLineItemIfNeededWithMarkdownString:headerMarkdown allowRepeatInsertions:YES];
+}
+
 static NSString* const codeMarkdown = @"    ";
 
 -(void) insertCodeBlockMarkdownIfNeeded{
-    [self insertFirstLineItemIfNeededWithMarkdownString:codeMarkdown];
+    [self insertFirstLineItemIfNeededWithMarkdownString:codeMarkdown allowRepeatInsertions:NO];
 }
 
 static NSString* const listItemMarkdown = @"- ";
 
 -(void) insertListItemIfNeeded{
-    [self insertFirstLineItemIfNeededWithMarkdownString:listItemMarkdown];
+    [self insertFirstLineItemIfNeededWithMarkdownString:listItemMarkdown allowRepeatInsertions:NO];
 }
 
 
 static NSString* const numberItemMarkdown = @"1. ";
 
 -(void) insertNumberItemIfNeeded{
-    [self insertFirstLineItemIfNeededWithMarkdownString:numberItemMarkdown];
+    [self insertFirstLineItemIfNeededWithMarkdownString:numberItemMarkdown allowRepeatInsertions:NO];
 }
 
 
 static NSString* const quoteMarkdown = @"> ";
 
 -(void) insertQuoteItemIfNeeded{
-    [self insertFirstLineItemIfNeededWithMarkdownString:quoteMarkdown];
+    [self insertFirstLineItemIfNeededWithMarkdownString:quoteMarkdown allowRepeatInsertions:NO];
 }
 
 /// Find an existing first line item markdown at the beginning of the line, if one is found no action needed. If one is not found a list item markdown will be inserted at the begining of the line
--(void) insertFirstLineItemIfNeededWithMarkdownString:(NSString*)markdownString {
+-(void) insertFirstLineItemIfNeededWithMarkdownString:(NSString*)markdownString allowRepeatInsertions:(BOOL)allowRepeatInsertions {
     
+    NSUInteger caretLocation = self.selectedRange.location;
     NSRange caretLineRange = [self getCaretLineRange];
     NSString *caretLineText = [self.text substringWithRange:caretLineRange];
-    if ([caretLineText hasPrefix:markdownString]) {
+    
+    if (!allowRepeatInsertions && [caretLineText hasPrefix:markdownString]) {
         //No action
     }
     else if ([caretLineText length] == 0) {
@@ -304,7 +312,7 @@ static NSString* const quoteMarkdown = @"> ";
         [attrString replaceCharactersInRange:caretLineRange withString:[NSString stringWithFormat:@"%@%@",markdownString,caretLineText]];
         
         self.attributedText = attrString;
-        self.selectedRange = NSMakeRange(caretLineRange.location+[markdownString length], 0);
+        self.selectedRange = NSMakeRange(caretLocation+[markdownString length], 0);
     }
 }
 

@@ -117,9 +117,10 @@
     return [_syntaxStorage attributedString];
 }
 
--(void) setDelegate:(id<UITextViewDelegate>)delegate {
-    if (delegate) {
-        NSAssert(delegate == self, @"Overriding UITextViewDelegate for %@",self);
+-(void) setDelegate:(id<UITextViewDelegate>)delegate
+{
+    if (delegate && delegate != self) {
+        NSAssert(NO, @"setting delegate disabled, use rcDelegate");
     } else {
         [super setDelegate:delegate];
     }

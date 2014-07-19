@@ -13,4 +13,7 @@
 
 @interface RFMarkdownTextView : UITextView <UITextViewDelegate>
 
+/// Designated Initializer
+- (id)initWithFrame:(CGRect)frame syntaxStorage:(RFMarkdownSyntaxStorage*)syntaxStorage;
+
 @end

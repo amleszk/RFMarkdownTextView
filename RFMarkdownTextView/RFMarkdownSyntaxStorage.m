@@ -11,17 +11,33 @@
 @interface RFMarkdownSyntaxStorage ()
 
 @property (nonatomic, strong) NSMutableAttributedString *attributedString;
-
 @property (nonatomic, strong) NSDictionary *attributeDictionary;
-@property (nonatomic, strong) NSDictionary *bodyFont;
 
 @end
 
 @implementation RFMarkdownSyntaxStorage
 
-- (id)init {
+-(instancetype) initWithBodyFont:(UIFont*)bodyFont
+                      bodyColour:(UIColor*)bodyColour
+                      linkColour:(UIColor*)linkColour
+                        boldFont:(UIFont*)boldFont
+                     italicsFont:(UIFont*)italicsFont
+                 boldItalicsFont:(UIFont*)boldItalicsFont
+{
     if (self = [super init]) {
-        _bodyFont = @{NSFontAttributeName:[UIFont systemFontOfSize:12], NSForegroundColorAttributeName:[UIColor blackColor],NSUnderlineStyleAttributeName:[NSNumber numberWithInt:NSUnderlineStyleNone]};
+        
+        _bodyAttributes =
+        @{  NSFontAttributeName : bodyFont,
+            NSForegroundColorAttributeName : bodyColour,
+            NSUnderlineStyleAttributeName: @(NSUnderlineStyleNone)
+            };
+        
+        _boldAttributes = @{ NSFontAttributeName : boldFont };
+        _italicAttributes = @{ NSFontAttributeName : italicsFont };
+        _boldItalicAttributes = @{ NSFontAttributeName : boldItalicsFont };
+        _codeAttributes = @{ NSForegroundColorAttributeName : [bodyColour colorWithAlphaComponent:0.5] };
+        _linkAttributes = @{ NSForegroundColorAttributeName : linkColour, NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle)};
+        
         _attributedString = [NSMutableAttributedString new];
         
         [self createHighlightPatterns];
@@ -68,11 +84,6 @@
 }
 
 - (void)createHighlightPatterns {
-    NSDictionary *boldAttributes = @{NSFontAttributeName:[UIFont boldSystemFontOfSize:12]};
-    NSDictionary *italicAttributes = @{NSFontAttributeName:[UIFont italicSystemFontOfSize:12]};
-    NSDictionary *boldItalicAttributes = @{NSFontAttributeName:[UIFont fontWithName:@"HelveticaNeue-BoldItalic" size:11.5]};
-    
-    NSDictionary *codeAttributes = @{NSForegroundColorAttributeName:[UIColor grayColor]};
     
     /*
      NSDictionary *headerOneAttributes = @{NSFontAttributeName:[UIFont boldSystemFontOfSize:14]};
@@ -91,23 +102,21 @@
      
      */
     
-    NSDictionary *linkAttributes = @{NSForegroundColorAttributeName:[UIColor colorWithRed:0.255 green:0.514 blue:0.769 alpha:1.00]};
-    
     _attributeDictionary = @{
-                      @"[a-zA-Z0-9\t\n ./<>?;:\\\"'`!@#$%^&*()[]{}_+=|\\-]":_bodyFont,
-                      @"\\**(?:^|[^*])(\\*\\*(\\w+(\\s\\w+)*)\\*\\*)":boldAttributes,
-                      @"\\**(?:^|[^*])(\\*(\\w+(\\s\\w+)*)\\*)":italicAttributes,
-                      @"(\\*\\*\\*\\w+(\\s\\w+)*\\*\\*\\*)":boldItalicAttributes,
-                      @"(`\\w+(\\s\\w+)*`)":codeAttributes,
-                      @"(```\n([\\s\n\\d\\w[/[\\.,-\\/#!?@$%\\^&\\*;:|{}<>+=\\-'_~()\\\"\\[\\]\\\\]/]]*)\n```)":codeAttributes,
-                      @"(\\[\\w+(\\s\\w+)*\\]\\(\\w+\\w[/[\\.,-\\/#!?@$%\\^&\\*;:|{}<>+=\\-'_~()\\\"\\[\\]\\\\]/ \\w+]*\\))":linkAttributes
+                      @"[a-zA-Z0-9\t\n ./<>?;:\\\"'`!@#$%^&*()[]{}_+=|\\-]":_bodyAttributes,
+                      @"\\**(?:^|[^*])(\\*\\*(\\w+(\\s\\w+)*)\\*\\*)":_boldAttributes,
+                      @"\\**(?:^|[^*])(\\*(\\w+(\\s\\w+)*)\\*)":_italicAttributes,
+                      @"(\\*\\*\\*\\w+(\\s\\w+)*\\*\\*\\*)":_boldItalicAttributes,
+                      @"(`\\w+(\\s\\w+)*`)":_codeAttributes,
+                      @"(```\n([\\s\n\\d\\w[/[\\.,-\\/#!?@$%\\^&\\*;:|{}<>+=\\-'_~()\\\"\\[\\]\\\\]/]]*)\n```)":_codeAttributes,
+                      @"(\\[\\w+(\\s\\w+)*\\]\\(\\w+\\w[/[\\.,-\\/#!?@$%\\^&\\*;:|{}<>+=\\-'_~()\\\"\\[\\]\\\\]/ \\w+]*\\))":_linkAttributes
                       };
 }
 
 - (void)update {
     [self createHighlightPatterns];
     
-    [self addAttributes:_bodyFont range:NSMakeRange(0, self.length)];
+    [self addAttributes:_bodyAttributes range:NSMakeRange(0, self.length)];
     
     [self applyStylesToRange:NSMakeRange(0, self.length)];
 }
@@ -124,7 +133,7 @@
                 [self addAttributes:attributes range:matchRange];
                 
                 if (NSMaxRange(matchRange)+1 < self.length) {
-                     [self addAttributes:_bodyFont range:NSMakeRange(NSMaxRange(matchRange)+1, 1)];
+                     [self addAttributes:_bodyAttributes range:NSMakeRange(NSMaxRange(matchRange)+1, 1)];
                 }
         }];
     }

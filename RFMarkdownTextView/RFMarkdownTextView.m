@@ -17,10 +17,11 @@
 
 @implementation RFMarkdownTextView
 
-- (id)initWithFrame:(CGRect)frame {
+- (id)initWithFrame:(CGRect)frame syntaxStorage:(RFMarkdownSyntaxStorage*)syntaxStorage
+{
     NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:@"" attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:12]}];
     
-    _syntaxStorage = [RFMarkdownSyntaxStorage new];
+    _syntaxStorage = syntaxStorage;
     [_syntaxStorage appendAttributedString:attrString];
     
     CGRect newTextViewRect = frame;

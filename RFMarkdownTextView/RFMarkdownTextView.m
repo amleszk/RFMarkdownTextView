@@ -89,6 +89,11 @@
         [weakSelf insertNumberItemIfNeeded];
     }];
 
+    UIButton *undo =
+    [self createButtonWithTitle:@"Undo" andEventHandler:^{
+        [[weakSelf undoManager] undo];
+    }];
+
     return @[header,
              bold,
              italics,
@@ -97,7 +102,8 @@
              code,
              link,
              bullet,
-             numbers];
+             numbers,
+             undo];
 }
 
 - (RFToolbarButton*)createButtonWithTitle:(NSString*)title andEventHandler:(void(^)())handler {

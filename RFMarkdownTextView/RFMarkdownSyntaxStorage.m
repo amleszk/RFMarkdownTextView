@@ -17,6 +17,15 @@
 
 @implementation RFMarkdownSyntaxStorage
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        NSAssert(NO, @"Do not call this initializer, provide font info");
+    }
+    return self;
+}
+
 -(instancetype) initWithBodyFont:(UIFont*)bodyFont
                       bodyColour:(UIColor*)bodyColour
                       linkColour:(UIColor*)linkColour

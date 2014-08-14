@@ -316,10 +316,9 @@ static NSString* const quoteMarkdown = @"> ";
         [self insertText:markdownString];
     }
     else { //Prepend the list item markup to this line
-        NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithAttributedString:self.attributedText];
-        [attrString replaceCharactersInRange:caretLineRange withString:[NSString stringWithFormat:@"%@%@",markdownString,caretLineText]];
+        NSTextStorage *textStorage = self.syntaxStorage;
+        [textStorage replaceCharactersInRange:caretLineRange withString:[NSString stringWithFormat:@"%@%@",markdownString,caretLineText]];
         
-        self.attributedText = attrString;
         self.selectedRange = NSMakeRange(caretLocation+[markdownString length], 0);
     }
 }

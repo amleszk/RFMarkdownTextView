@@ -12,6 +12,7 @@
 
 @property (nonatomic) NSDictionary *bodyAttributes;
 @property (nonatomic) NSDictionary *boldAttributes;
+@property (nonatomic) NSDictionary *strikeAttributes;
 @property (nonatomic) NSDictionary *italicAttributes;
 @property (nonatomic) NSDictionary *boldItalicAttributes;
 @property (nonatomic) NSDictionary *codeAttributes;

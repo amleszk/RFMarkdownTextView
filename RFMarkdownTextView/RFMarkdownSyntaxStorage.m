@@ -29,6 +29,7 @@
         _bodyAttributes =
         @{  NSFontAttributeName : bodyFont,
             NSForegroundColorAttributeName : bodyColour,
+            NSStrikethroughStyleAttributeName : @0,
             NSUnderlineStyleAttributeName: @(NSUnderlineStyleNone)
             };
         
@@ -36,6 +37,7 @@
         _italicAttributes = @{ NSFontAttributeName : italicsFont };
         _boldItalicAttributes = @{ NSFontAttributeName : boldItalicsFont };
         _codeAttributes = @{ NSForegroundColorAttributeName : [bodyColour colorWithAlphaComponent:0.5] };
+        _strikeAttributes = @{ NSStrikethroughStyleAttributeName : @1 };
         _linkAttributes = @{ NSForegroundColorAttributeName : linkColour, NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle)};
         
         _attributedString = [NSMutableAttributedString new];
@@ -44,6 +46,8 @@
     }
     return self;
 }
+
+#pragma mark - Concrete overrides
 
 - (NSString *)string {
     return [_attributedString string];
@@ -55,21 +59,19 @@
 
 - (void)replaceCharactersInRange:(NSRange)range withString:(NSString*)str {
     [self beginEditing];
-    
     [_attributedString replaceCharactersInRange:range withString:str];
-    
     [self edited:NSTextStorageEditedCharacters | NSTextStorageEditedAttributes range:range changeInLength:str.length - range.length];
     [self endEditing];
 }
 
 - (void)setAttributes:(NSDictionary*)attrs range:(NSRange)range {
     [self beginEditing];
-    
     [_attributedString setAttributes:attrs range:range];
-    
     [self edited:NSTextStorageEditedAttributes range:range changeInLength:0];
     [self endEditing];
 }
+
+#pragma mark - Additional Concrete overrides
 
 - (void)processEditing {
     [self performReplacementsForRange:[self editedRange]];
@@ -103,14 +105,15 @@
      */
     
     _attributeDictionary = @{
-                      @"[a-zA-Z0-9\t\n ./<>?;:\\\"'`!@#$%^&*()[]{}_+=|\\-]":_bodyAttributes,
-                      @"\\**(?:^|[^*])(\\*\\*(\\w+(\\s\\w+)*)\\*\\*)":_boldAttributes,
-                      @"\\**(?:^|[^*])(\\*(\\w+(\\s\\w+)*)\\*)":_italicAttributes,
-                      @"(\\*\\*\\*\\w+(\\s\\w+)*\\*\\*\\*)":_boldItalicAttributes,
-                      @"(`\\w+(\\s\\w+)*`)":_codeAttributes,
-                      @"(```\n([\\s\n\\d\\w[/[\\.,-\\/#!?@$%\\^&\\*;:|{}<>+=\\-'_~()\\\"\\[\\]\\\\]/]]*)\n```)":_codeAttributes,
-                      @"(\\[\\w+(\\s\\w+)*\\]\\(\\w+\\w[/[\\.,-\\/#!?@$%\\^&\\*;:|{}<>+=\\-'_~()\\\"\\[\\]\\\\]/ \\w+]*\\))":_linkAttributes
-                      };
+        @"[a-zA-Z0-9\t\n ./<>?;:\\\"'`!@#$%^&*()[]{}_+=|\\-]":_bodyAttributes,
+        @"\\**(?:^|[^*])(\\*\\*(\\w+(\\s\\w+)*)\\*\\*)":_boldAttributes,
+        @"\\**(?:^|[^*])(\\*(\\w+(\\s\\w+)*)\\*)":_italicAttributes,
+        @"(\\*\\*\\*\\w+(\\s\\w+)*\\*\\*\\*)":_boldItalicAttributes,
+        @"(~~\\w+(\\s\\w+)*~~)":_strikeAttributes,
+        @"(`\\w+(\\s\\w+)*`)":_codeAttributes,
+        @"(```\n([\\s\n\\d\\w[/[\\.,-\\/#!?@$%\\^&\\*;:|{}<>+=\\-'_~()\\\"\\[\\]\\\\]/]]*)\n```)":_codeAttributes,
+        @"(\\[\\w+(\\s\\w+)*\\]\\(\\w+\\w[/[\\.,-\\/#!?@$%\\^&\\*;:|{}<>+=\\-'_~()\\\"\\[\\]\\\\]/ \\w+]*\\))":_linkAttributes
+    };
 }
 
 - (void)update {

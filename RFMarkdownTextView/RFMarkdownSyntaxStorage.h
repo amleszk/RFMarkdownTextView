@@ -18,6 +18,13 @@
 @property (nonatomic) NSDictionary *codeAttributes;
 @property (nonatomic) NSDictionary *linkAttributes;
 
+@property (nonatomic) NSDictionary *headerOneAttributes;
+@property (nonatomic) NSDictionary *headerTwoAttributes;
+@property (nonatomic) NSDictionary *headerThreeAttributes;
+@property (nonatomic) NSDictionary *headerFourAttributes;
+@property (nonatomic) NSDictionary *headerFiveAttributes;
+@property (nonatomic) NSDictionary *headerSixAttributes;
+
 -(NSAttributedString *) attributedString;
 
 - (void)update;
@@ -27,6 +34,11 @@
                       linkColour:(UIColor*)linkColour
                         boldFont:(UIFont*)boldFont
                      italicsFont:(UIFont*)italicsFont
-                 boldItalicsFont:(UIFont*)boldItalicsFont;
-
+                 boldItalicsFont:(UIFont*)boldItalicsFont
+                   headerOneFont:(UIFont*)headerOneFont
+                   headerTwoFont:(UIFont*)headerTwoFont
+                 headerThreeFont:(UIFont*)headerThreeFont
+                  headerFourFont:(UIFont*)headerFourFont
+                  headerFiveFont:(UIFont*)headerFiveFont
+                   headerSixFont:(UIFont*)headerSixFont;
 @end

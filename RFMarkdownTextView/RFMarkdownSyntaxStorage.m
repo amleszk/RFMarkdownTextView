@@ -23,6 +23,12 @@
                         boldFont:(UIFont*)boldFont
                      italicsFont:(UIFont*)italicsFont
                  boldItalicsFont:(UIFont*)boldItalicsFont
+                   headerOneFont:(UIFont*)headerOneFont
+                   headerTwoFont:(UIFont*)headerTwoFont
+                 headerThreeFont:(UIFont*)headerThreeFont
+                  headerFourFont:(UIFont*)headerFourFont
+                  headerFiveFont:(UIFont*)headerFiveFont
+                   headerSixFont:(UIFont*)headerSixFont
 {
     if (self = [super init]) {
         
@@ -39,6 +45,13 @@
         _codeAttributes = @{ NSForegroundColorAttributeName : [bodyColour colorWithAlphaComponent:0.5] };
         _strikeAttributes = @{ NSStrikethroughStyleAttributeName : @1 };
         _linkAttributes = @{ NSForegroundColorAttributeName : linkColour, NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle)};
+        
+        _headerOneAttributes = @{ NSFontAttributeName : headerOneFont };
+        _headerTwoAttributes = @{ NSFontAttributeName : headerTwoFont };
+        _headerThreeAttributes = @{ NSFontAttributeName : headerThreeFont };
+        _headerFourAttributes = @{ NSFontAttributeName : headerFourFont };
+        _headerFiveAttributes = @{ NSFontAttributeName : headerFiveFont };
+        _headerSixAttributes = @{ NSFontAttributeName : headerSixFont };
         
         _attributedString = [NSMutableAttributedString new];
         
@@ -110,6 +123,14 @@
         @"\\**(?:^|[^*])(\\*(\\w+(\\s\\w+)*)\\*)":_italicAttributes,
         @"(\\*\\*\\*\\w+(\\s\\w+)*\\*\\*\\*)":_boldItalicAttributes,
         @"(~~\\w+(\\s\\w+)*~~)":_strikeAttributes,
+        
+        @"(######\\s\\w+(\\s\\w+)*\\n)":_headerSixAttributes,
+        @"(#####\\s\\w+(\\s\\w+)*\\n)":_headerFiveAttributes,
+        @"(####\\s\\w+(\\s\\w+)*\\n)":_headerFourAttributes,
+        @"(###\\s\\w+(\\s\\w+)*\\n)":_headerThreeAttributes,
+        @"(##\\s\\w+(\\s\\w+)*\\n)":_headerTwoAttributes,
+        @"(#\\s\\w+(\\s\\w+)*\\n)":_headerOneAttributes,
+        
         @"(`\\w+(\\s\\w+)*`)":_codeAttributes,
         @"(```\n([\\s\n\\d\\w[/[\\.,-\\/#!?@$%\\^&\\*;:|{}<>+=\\-'_~()\\\"\\[\\]\\\\]/]]*)\n```)":_codeAttributes,
         @"(\\[\\w+(\\s\\w+)*\\]\\(\\w+\\w[/[\\.,-\\/#!?@$%\\^&\\*;:|{}<>+=\\-'_~()\\\"\\[\\]\\\\]/ \\w+]*\\))":_linkAttributes

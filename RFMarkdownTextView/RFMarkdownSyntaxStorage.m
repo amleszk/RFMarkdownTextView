@@ -100,23 +100,6 @@
 
 - (void)createHighlightPatterns {
     
-    /*
-     NSDictionary *headerOneAttributes = @{NSFontAttributeName:[UIFont boldSystemFontOfSize:14]};
-     NSDictionary *headerTwoAttributes = @{NSFontAttributeName:[UIFont boldSystemFontOfSize:13]};
-     NSDictionary *headerThreeAttributes = @{NSFontAttributeName:[UIFont boldSystemFontOfSize:12.5]};
-     
-     Alternate H1 with underline:
-     
-     NSDictionary *headerOneAttributes = @{NSFontAttributeName:[UIFont boldSystemFontOfSize:14],NSUnderlineStyleAttributeName:[NSNumber numberWithInt:NSUnderlineStyleSingle], NSUnderlineColorAttributeName:[UIColor colorWithWhite:0.933 alpha:1.0]};
-     
-     Headers need to be worked on...
-     
-     @"(\\#\\w+(\\s\\w+)*\n)":headerOneAttributes,
-     @"(\\##\\w+(\\s\\w+)*\n)":headerTwoAttributes,
-     @"(\\###\\w+(\\s\\w+)*\n)":headerThreeAttributes
-     
-     */
-    
     _attributeDictionary = @{
         @"[a-zA-Z0-9\t\n ./<>?;:\\\"'`!@#$%^&*()[]{}_+=|\\-]":_bodyAttributes,
         @"\\**(?:^|[^*])(\\*\\*(\\w+(\\s\\w+)*)\\*\\*)":_boldAttributes,

@@ -134,15 +134,10 @@
 }
 
 -(void) setAttributedText:(NSAttributedString *)attributedText {
-    _syntaxStorage = [RFMarkdownSyntaxStorage new];
-    NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:@"" attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:12]}];
-    [_syntaxStorage appendAttributedString:attrString];
-    [_syntaxStorage appendAttributedString:attributedText];
-    [_syntaxStorage setAttributedString:[[NSMutableAttributedString alloc] initWithAttributedString:attributedText]];
-    [_syntaxStorage addLayoutManager:self.layoutManager];
-    [super setAttributedText:attributedText];
+    [_syntaxStorage beginEditing];
+    [_syntaxStorage setAttributedString:attributedText];
+    [_syntaxStorage endEditing];
 }
-
 
 #pragma mark - UITextViewDelegate
 

@@ -19,7 +19,7 @@
 
 - (id)initWithFrame:(CGRect)frame syntaxStorage:(RFMarkdownSyntaxStorage*)syntaxStorage
 {
-    NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:@"" attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:12]}];
+    NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:@"" attributes:syntaxStorage.bodyAttributes];
     
     _syntaxStorage = syntaxStorage;
     [_syntaxStorage appendAttributedString:attrString];

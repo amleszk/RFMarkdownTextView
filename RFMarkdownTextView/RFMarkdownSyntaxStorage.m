@@ -10,7 +10,7 @@
 
 @interface RFMarkdownSyntaxStorage ()
 
-@property (nonatomic, strong) NSMutableAttributedString *attributedString;
+@property (nonatomic, strong) NSMutableAttributedString *attributedStringBackingStore;
 @property (nonatomic, strong) NSDictionary *attributeDictionary;
 
 @end
@@ -62,7 +62,7 @@
         _headerFiveAttributes = @{ NSFontAttributeName : headerFiveFont };
         _headerSixAttributes = @{ NSFontAttributeName : headerSixFont };
         
-        _attributedString = [NSMutableAttributedString new];
+        _attributedStringBackingStore = [NSMutableAttributedString new];
         
         [self createHighlightPatterns];
     }
@@ -72,23 +72,23 @@
 #pragma mark - Concrete overrides
 
 - (NSString *)string {
-    return [_attributedString string];
+    return [_attributedStringBackingStore string];
 }
 
 - (NSDictionary *)attributesAtIndex:(NSUInteger)location effectiveRange:(NSRangePointer)range {
-    return [_attributedString attributesAtIndex:location effectiveRange:range];
+    return [_attributedStringBackingStore attributesAtIndex:location effectiveRange:range];
 }
 
 - (void)replaceCharactersInRange:(NSRange)range withString:(NSString*)str {
     [self beginEditing];
-    [_attributedString replaceCharactersInRange:range withString:str];
+    [_attributedStringBackingStore replaceCharactersInRange:range withString:str];
     [self edited:NSTextStorageEditedCharacters | NSTextStorageEditedAttributes range:range changeInLength:str.length - range.length];
     [self endEditing];
 }
 
 - (void)setAttributes:(NSDictionary*)attrs range:(NSRange)range {
     [self beginEditing];
-    [_attributedString setAttributes:attrs range:range];
+    [_attributedStringBackingStore setAttributes:attrs range:range];
     [self edited:NSTextStorageEditedAttributes range:range changeInLength:0];
     [self endEditing];
 }
@@ -101,8 +101,8 @@
 }
 
 - (void)performReplacementsForRange:(NSRange)changedRange {
-    NSRange extendedRange = NSUnionRange(changedRange, [[_attributedString string] lineRangeForRange:NSMakeRange(changedRange.location, 0)]);
-    extendedRange = NSUnionRange(changedRange, [[_attributedString string] lineRangeForRange:NSMakeRange(NSMaxRange(changedRange), 0)]);
+    NSRange extendedRange = NSUnionRange(changedRange, [[_attributedStringBackingStore string] lineRangeForRange:NSMakeRange(changedRange.location, 0)]);
+    extendedRange = NSUnionRange(changedRange, [[_attributedStringBackingStore string] lineRangeForRange:NSMakeRange(NSMaxRange(changedRange), 0)]);
     
     [self applyStylesToRange:extendedRange];
 }
@@ -143,7 +143,7 @@
         
         NSDictionary *attributes = _attributeDictionary[key];
         
-        [regex enumerateMatchesInString:[_attributedString string] options:0 range:searchRange
+        [regex enumerateMatchesInString:[_attributedStringBackingStore string] options:0 range:searchRange
             usingBlock:^(NSTextCheckingResult *match, NSMatchingFlags flags, BOOL *stop) {
                 NSRange matchRange = [match rangeAtIndex:1];
                 [self addAttributes:attributes range:matchRange];

@@ -46,53 +46,67 @@
     
     __weak typeof(self)weakSelf = self;
     UIButton *header =
-    [self createButtonWithTitle:@"#" andEventHandler:^{
+    [self createButtonWithTitle:@"#" andEventHandler:^(id sender){
         [weakSelf insertHeaderMarkdownIfNeeded];
     }];
 
     UIButton *bold =
-    [self createButtonWithTitle:@"**" andEventHandler:^{
+    [self createButtonWithTitle:@"**" andEventHandler:^(id sender){
         [weakSelf insertOrSurroundWithText:@"**"];
     }];
     
     UIButton *italics =
-    [self createButtonWithTitle:@"*" andEventHandler:^{
+    [self createButtonWithTitle:@"*" andEventHandler:^(id sender){
         [weakSelf insertOrSurroundWithText:@"*"];
     }];
 
     UIButton *strike =
-    [self createButtonWithTitle:@"~~" andEventHandler:^{
+    [self createButtonWithTitle:@"~~" andEventHandler:^(id sender){
         [weakSelf insertOrSurroundWithText:@"~~"];
     }];
 
     UIButton *code =
-    [self createButtonWithTitle:@"Code" andEventHandler:^{
+    [self createButtonWithTitle:@"Code" andEventHandler:^(id sender){
         [weakSelf insertCodeBlockMarkdownIfNeeded];
     }];
     
     UIButton *quote =
-    [self createButtonWithTitle:@"Quote" andEventHandler:^{
+    [self createButtonWithTitle:@"Quote" andEventHandler:^(id sender){
         [weakSelf insertQuoteItemIfNeeded];
     }];
 
     UIButton *link =
-    [self createButtonWithTitle:@"Link" andEventHandler:^{
+    [self createButtonWithTitle:@"Link" andEventHandler:^(id sender){
         [weakSelf insertLinkMarkdown];
     }];
 
     UIButton *bullet =
-    [self createButtonWithTitle:@"Bullet" andEventHandler:^{
+    [self createButtonWithTitle:@"Bullet" andEventHandler:^(id sender){
         [weakSelf insertListItemIfNeeded];
     }];
 
     UIButton *numbers =
-    [self createButtonWithTitle:@"Numbers" andEventHandler:^{
+    [self createButtonWithTitle:@"Numbers" andEventHandler:^(id sender){
         [weakSelf insertNumberItemIfNeeded];
     }];
 
     UIButton *undo =
-    [self createButtonWithTitle:@"Undo" andEventHandler:^{
+    [self createButtonWithTitle:@"Undo" andEventHandler:^(id sender){
         [[weakSelf undoManager] undo];
+    }];
+
+    UIButton *help =
+    [self createButtonWithTitle:@"Help" andEventHandler:^(id sender){
+        if ([weakSelf.markdownTextViewDelegate respondsToSelector:@selector(markdownTextView:didTapHelpWithSender:)]) {
+            [weakSelf.markdownTextViewDelegate markdownTextView:self didTapHelpWithSender:sender];
+        }
+    }];
+
+    UIButton *preview =
+    [self createButtonWithTitle:@"Preview" andEventHandler:^(id sender){
+        if ([weakSelf.markdownTextViewDelegate respondsToSelector:@selector(markdownTextView:didTapPreviewWithSender:)]) {
+            [weakSelf.markdownTextViewDelegate markdownTextView:self didTapPreviewWithSender:sender];
+        }
     }];
 
     return @[header,
@@ -104,7 +118,9 @@
              link,
              bullet,
              numbers,
-             undo];
+             undo,
+             preview,
+             help];
 }
 
 - (RFToolbarButton*)createButtonWithTitle:(NSString*)title andEventHandler:(void(^)())handler {
@@ -131,6 +147,12 @@
     } else {
         [super setDelegate:delegate];
     }
+}
+
+-(void) setText:(NSString *)text {
+    [_syntaxStorage beginEditing];
+    [_syntaxStorage setAttributedString:[[NSAttributedString alloc] initWithString:text attributes:_syntaxStorage.bodyAttributes]];
+    [_syntaxStorage endEditing];
 }
 
 -(void) setAttributedText:(NSAttributedString *)attributedText {

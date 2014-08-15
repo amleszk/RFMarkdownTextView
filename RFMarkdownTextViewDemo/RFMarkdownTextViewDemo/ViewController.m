@@ -21,31 +21,38 @@
     
     self.title = @"RFMarkdownTextView";
     
-    UIFont* bodyFont = [UIFont systemFontOfSize:15.];
-    UIFont* boldFont = [UIFont boldSystemFontOfSize:15.];
-    UIFont* italicsFont = [UIFont italicSystemFontOfSize:15.];
-    UIFont* boldItalicsFont = [UIFont italicSystemFontOfSize:16.];
-    
-    UIFont* headerOneFont = [UIFont systemFontOfSize:22.];
-    UIFont* headerTwoFont = [UIFont systemFontOfSize:21.];
-    UIFont* headerThreeFont = [UIFont systemFontOfSize:20.];
-    UIFont* headerFourFont = [UIFont systemFontOfSize:19.];
-    UIFont* headerFiveFont = [UIFont systemFontOfSize:18.];
-    UIFont* headerSixFont = [UIFont systemFontOfSize:17.];
-    
-    RFMarkdownSyntaxStorage *syntaxStorage = [[RFMarkdownSyntaxStorage alloc] initWithBodyFont:bodyFont
-                                                                                    bodyColour:[UIColor blackColor]
-                                                                                    linkColour:[UIColor blueColor]
-                                                                                      boldFont:boldFont
-                                                                                   italicsFont:italicsFont
-                                                                               boldItalicsFont:boldItalicsFont
-                                                                                 headerOneFont:headerOneFont
-                                                                                 headerTwoFont:headerTwoFont
-                                                                               headerThreeFont:headerThreeFont
-                                                                                headerFourFont:headerFourFont
-                                                                                headerFiveFont:headerFiveFont
-                                                                                 headerSixFont:headerSixFont];
-                                              
+    RFMarkdownSyntaxStorage *syntaxStorage = [[RFMarkdownSyntaxStorage alloc] init];
+    UIFont* bodyFont = [UIFont fontWithName:@"Verdana" size:15.];
+    UIFont* boldFont = [UIFont fontWithName:@"Verdana-Bold" size:15.];
+    UIFont* italicsFont = [UIFont fontWithName:@"Verdana-Italic" size:15.];
+    UIFont* boldItalicsFont = [UIFont fontWithName:@"Verdana-BoldItalic" size:15.];
+
+    syntaxStorage.bodyAttributes =
+    @{  NSFontAttributeName : bodyFont,
+        NSForegroundColorAttributeName : [UIColor blackColor],
+        NSStrikethroughStyleAttributeName : @0,
+        NSUnderlineStyleAttributeName: @(NSUnderlineStyleNone),
+        NSBackgroundColorAttributeName : [UIColor clearColor]
+    };
+
+    syntaxStorage.boldAttributes = @{ NSFontAttributeName : boldFont };
+    syntaxStorage.italicAttributes = @{ NSFontAttributeName : italicsFont };
+    syntaxStorage.boldItalicAttributes = @{ NSFontAttributeName : boldItalicsFont };
+    syntaxStorage.codeAttributes = @{
+        NSFontAttributeName : [UIFont fontWithName:@"Courier New" size:15.],
+        NSForegroundColorAttributeName : [[UIColor blackColor] colorWithAlphaComponent:0.5]
+    };
+    syntaxStorage.strikeAttributes = @{ NSStrikethroughStyleAttributeName : @1 };
+    syntaxStorage.linkAttributes = @{ NSForegroundColorAttributeName : [[UIColor blueColor] colorWithAlphaComponent:0.7], NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle)};
+    syntaxStorage.blockQuoteAttributes = @{ NSBackgroundColorAttributeName : [[UIColor blueColor] colorWithAlphaComponent:0.2]};
+
+    syntaxStorage.headerOneAttributes = @{ NSFontAttributeName : [UIFont systemFontOfSize:22.] };
+    syntaxStorage.headerTwoAttributes = @{ NSFontAttributeName : [UIFont systemFontOfSize:21.] };
+    syntaxStorage.headerThreeAttributes = @{ NSFontAttributeName : [UIFont systemFontOfSize:20.] };
+    syntaxStorage.headerFourAttributes = @{ NSFontAttributeName : [UIFont systemFontOfSize:19.] };
+    syntaxStorage.headerFiveAttributes = @{ NSFontAttributeName : [UIFont systemFontOfSize:18.] };
+    syntaxStorage.headerSixAttributes = @{ NSFontAttributeName : [UIFont systemFontOfSize:17.] };
+    [syntaxStorage updateHighlightPatterns];
     
     _textView = [[RFMarkdownTextView alloc] initWithFrame:self.view.bounds syntaxStorage:syntaxStorage];
     

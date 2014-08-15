@@ -17,6 +17,7 @@
 @property (nonatomic) NSDictionary *boldItalicAttributes;
 @property (nonatomic) NSDictionary *codeAttributes;
 @property (nonatomic) NSDictionary *linkAttributes;
+@property (nonatomic) NSDictionary *blockQuoteAttributes;
 
 @property (nonatomic) NSDictionary *headerOneAttributes;
 @property (nonatomic) NSDictionary *headerTwoAttributes;
@@ -26,19 +27,7 @@
 @property (nonatomic) NSDictionary *headerSixAttributes;
 
 -(NSAttributedString *) attributedString;
-
+- (void)updateHighlightPatterns;
 - (void)update;
 
--(instancetype) initWithBodyFont:(UIFont*)bodyFont
-                      bodyColour:(UIColor*)bodyColour
-                      linkColour:(UIColor*)linkColour
-                        boldFont:(UIFont*)boldFont
-                     italicsFont:(UIFont*)italicsFont
-                 boldItalicsFont:(UIFont*)boldItalicsFont
-                   headerOneFont:(UIFont*)headerOneFont
-                   headerTwoFont:(UIFont*)headerTwoFont
-                 headerThreeFont:(UIFont*)headerThreeFont
-                  headerFourFont:(UIFont*)headerFourFont
-                  headerFiveFont:(UIFont*)headerFiveFont
-                   headerSixFont:(UIFont*)headerSixFont;
 @end

@@ -7,69 +7,34 @@
 //
 
 #import "RFMarkdownSyntaxStorage.h"
+#import "RFMarkdownRegexMatcher.h"
 
 @interface RFMarkdownSyntaxStorage ()
 
 @property (nonatomic, strong) NSMutableAttributedString *attributedStringBackingStore;
 @property (nonatomic, strong) NSDictionary *attributeDictionary;
+@property (strong,nonatomic) RFMarkdownRegexMatcher *markdownRegexMatcher;
 
 @end
 
 @implementation RFMarkdownSyntaxStorage
 
-- (instancetype)init
-{
-    self = [super init];
-    if (self) {
-        NSAssert(NO, @"Do not call this initializer, provide font info");
-    }
-    return self;
-}
-
--(instancetype) initWithBodyFont:(UIFont*)bodyFont
-                      bodyColour:(UIColor*)bodyColour
-                      linkColour:(UIColor*)linkColour
-                        boldFont:(UIFont*)boldFont
-                     italicsFont:(UIFont*)italicsFont
-                 boldItalicsFont:(UIFont*)boldItalicsFont
-                   headerOneFont:(UIFont*)headerOneFont
-                   headerTwoFont:(UIFont*)headerTwoFont
-                 headerThreeFont:(UIFont*)headerThreeFont
-                  headerFourFont:(UIFont*)headerFourFont
-                  headerFiveFont:(UIFont*)headerFiveFont
-                   headerSixFont:(UIFont*)headerSixFont
+-(instancetype) init
 {
     if (self = [super init]) {
         
-        _bodyAttributes =
-        @{  NSFontAttributeName : bodyFont,
-            NSForegroundColorAttributeName : bodyColour,
-            NSStrikethroughStyleAttributeName : @0,
-            NSUnderlineStyleAttributeName: @(NSUnderlineStyleNone)
-            };
-        
-        _boldAttributes = @{ NSFontAttributeName : boldFont };
-        _italicAttributes = @{ NSFontAttributeName : italicsFont };
-        _boldItalicAttributes = @{ NSFontAttributeName : boldItalicsFont };
-        _codeAttributes = @{ NSForegroundColorAttributeName : [bodyColour colorWithAlphaComponent:0.5] };
-        _strikeAttributes = @{ NSStrikethroughStyleAttributeName : @1 };
-        _linkAttributes = @{ NSForegroundColorAttributeName : linkColour, NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle)};
-        
-        _headerOneAttributes = @{ NSFontAttributeName : headerOneFont };
-        _headerTwoAttributes = @{ NSFontAttributeName : headerTwoFont };
-        _headerThreeAttributes = @{ NSFontAttributeName : headerThreeFont };
-        _headerFourAttributes = @{ NSFontAttributeName : headerFourFont };
-        _headerFiveAttributes = @{ NSFontAttributeName : headerFiveFont };
-        _headerSixAttributes = @{ NSFontAttributeName : headerSixFont };
-        
+        _markdownRegexMatcher = [[RFMarkdownRegexMatcher alloc] init];
         _attributedStringBackingStore = [NSMutableAttributedString new];
         
-        [self createHighlightPatterns];
     }
     return self;
 }
 
 #pragma mark - Concrete overrides
+
+-(NSAttributedString *) attributedString {
+    return _attributedStringBackingStore;
+}
 
 - (NSString *)string {
     return [_attributedStringBackingStore string];
@@ -107,30 +72,30 @@
     [self applyStylesToRange:extendedRange];
 }
 
-- (void)createHighlightPatterns {
+- (void)updateHighlightPatterns {
     
     _attributeDictionary = @{
-        @"[a-zA-Z0-9\t\n ./<>?;:\\\"'`!@#$%^&*()[]{}_+=|\\-]":_bodyAttributes,
-        @"\\**(?:^|[^*])(\\*\\*(\\w+(\\s\\w+)*)\\*\\*)":_boldAttributes,
-        @"\\**(?:^|[^*])(\\*(\\w+(\\s\\w+)*)\\*)":_italicAttributes,
-        @"(\\*\\*\\*\\w+(\\s\\w+)*\\*\\*\\*)":_boldItalicAttributes,
-        @"(~~\\w+(\\s\\w+)*~~)":_strikeAttributes,
+                             
+        @(RFMarkdownRegexMatchTypeBold) : _boldAttributes ?: @{},
+        @(RFMarkdownRegexMatchTypeItalics) : _italicAttributes ?: @{},
+        @(RFMarkdownRegexMatchTypeBoldItalics) : _boldItalicAttributes ?: @{},
+        @(RFMarkdownRegexMatchTypeStrike) : _strikeAttributes ?: @{},
         
-        @"(######\\s\\w+(\\s\\w+)*\\n)":_headerSixAttributes,
-        @"(#####\\s\\w+(\\s\\w+)*\\n)":_headerFiveAttributes,
-        @"(####\\s\\w+(\\s\\w+)*\\n)":_headerFourAttributes,
-        @"(###\\s\\w+(\\s\\w+)*\\n)":_headerThreeAttributes,
-        @"(##\\s\\w+(\\s\\w+)*\\n)":_headerTwoAttributes,
-        @"(#\\s\\w+(\\s\\w+)*\\n)":_headerOneAttributes,
+        @(RFMarkdownRegexMatchTypeHeader6) : _headerSixAttributes ?: @{},
+        @(RFMarkdownRegexMatchTypeHeader5) : _headerFiveAttributes ?: @{},
+        @(RFMarkdownRegexMatchTypeHeader4) : _headerFourAttributes ?: @{},
+        @(RFMarkdownRegexMatchTypeHeader3) : _headerThreeAttributes ?: @{},
+        @(RFMarkdownRegexMatchTypeHeader2) : _headerTwoAttributes ?: @{},
+        @(RFMarkdownRegexMatchTypeHeader1) : _headerOneAttributes ?: @{},
         
-        @"(`\\w+(\\s\\w+)*`)":_codeAttributes,
-        @"(```\n([\\s\n\\d\\w[/[\\.,-\\/#!?@$%\\^&\\*;:|{}<>+=\\-'_~()\\\"\\[\\]\\\\]/]]*)\n```)":_codeAttributes,
-        @"(\\[\\w+(\\s\\w+)*\\]\\(\\w+\\w[/[\\.,-\\/#!?@$%\\^&\\*;:|{}<>+=\\-'_~()\\\"\\[\\]\\\\]/ \\w+]*\\))":_linkAttributes
+        @(RFMarkdownRegexMatchTypeCode) : _codeAttributes ?: @{},
+        @(RFMarkdownRegexMatchTypeBlockQuote) : _blockQuoteAttributes ?: @{},
+        @(RFMarkdownRegexMatchTypeLink) : _linkAttributes ?: @{}
     };
 }
 
 - (void)update {
-    [self createHighlightPatterns];
+    [self updateHighlightPatterns];
     
     [self addAttributes:_bodyAttributes range:NSMakeRange(0, self.length)];
     
@@ -138,20 +103,19 @@
 }
 
 - (void)applyStylesToRange:(NSRange)searchRange {
-    for (NSString *key in _attributeDictionary) {
-        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:key options:0 error:nil];
-        
-        NSDictionary *attributes = _attributeDictionary[key];
-        
-        [regex enumerateMatchesInString:[_attributedStringBackingStore string] options:0 range:searchRange
-            usingBlock:^(NSTextCheckingResult *match, NSMatchingFlags flags, BOOL *stop) {
-                NSRange matchRange = [match rangeAtIndex:1];
-                [self addAttributes:attributes range:matchRange];
-                
-                if (NSMaxRange(matchRange)+1 < self.length) {
-                     [self addAttributes:_bodyAttributes range:NSMakeRange(NSMaxRange(matchRange)+1, 1)];
-                }
-        }];
+    
+    NSArray *tokens = [_markdownRegexMatcher markdownTokensForString:[_attributedStringBackingStore string] searchRange:searchRange];
+    for (RFMarkdownRegexMatch *match in tokens) {
+        NSDictionary *attributes = _attributeDictionary[@(match.matchType)];
+        if (match.stripAllOtherAttributes) {
+            [self setAttributes:@{} range:match.matchRange];
+        }
+        if (attributes) {
+            [self addAttributes:attributes range:match.matchRange];
+            if (NSMaxRange(match.matchRange)+1 < self.length) {
+                [self addAttributes:_bodyAttributes range:NSMakeRange(NSMaxRange(match.matchRange)+1, 1)];
+            }
+        }
     }
 }
 

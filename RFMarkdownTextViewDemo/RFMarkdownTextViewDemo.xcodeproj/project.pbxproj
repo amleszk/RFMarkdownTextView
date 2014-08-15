@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		61B9B94C194422B0007DB8DA /* UIPasteboard+RFMarkdown.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B9B94B194422B0007DB8DA /* UIPasteboard+RFMarkdown.m */; };
+		61FF073A199DA5DF002B4D5F /* RFMarkdownRegexMatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = 61FF0739199DA5DF002B4D5F /* RFMarkdownRegexMatcher.m */; };
 		CE041EFF1852A74100F79297 /* RFMarkdownSyntaxStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = CE041EFE1852A74100F79297 /* RFMarkdownSyntaxStorage.m */; };
 		CEEF0E7D184EA3FE00B7DEDF /* RFMarkdownTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = CEEF0E7C184EA3FE00B7DEDF /* RFMarkdownTextView.m */; };
 		EE92B928DE3645F2949E9F61 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D8974789EB0412CA72B3577 /* libPods.a */; };
@@ -39,6 +40,8 @@
 /* Begin PBXFileReference section */
 		61B9B94A194422B0007DB8DA /* UIPasteboard+RFMarkdown.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIPasteboard+RFMarkdown.h"; sourceTree = "<group>"; };
 		61B9B94B194422B0007DB8DA /* UIPasteboard+RFMarkdown.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIPasteboard+RFMarkdown.m"; sourceTree = "<group>"; };
+		61FF0738199DA5DF002B4D5F /* RFMarkdownRegexMatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RFMarkdownRegexMatcher.h; sourceTree = "<group>"; };
+		61FF0739199DA5DF002B4D5F /* RFMarkdownRegexMatcher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RFMarkdownRegexMatcher.m; sourceTree = "<group>"; };
 		8D8974789EB0412CA72B3577 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE041EFD1852A74100F79297 /* RFMarkdownSyntaxStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RFMarkdownSyntaxStorage.h; sourceTree = "<group>"; };
 		CE041EFE1852A74100F79297 /* RFMarkdownSyntaxStorage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RFMarkdownSyntaxStorage.m; sourceTree = "<group>"; };
@@ -93,10 +96,12 @@
 		CEEF0E7A184EA3FE00B7DEDF /* RFMarkdownTextView */ = {
 			isa = PBXGroup;
 			children = (
-				CEEF0E7B184EA3FE00B7DEDF /* RFMarkdownTextView.h */,
-				CEEF0E7C184EA3FE00B7DEDF /* RFMarkdownTextView.m */,
+				61FF0738199DA5DF002B4D5F /* RFMarkdownRegexMatcher.h */,
+				61FF0739199DA5DF002B4D5F /* RFMarkdownRegexMatcher.m */,
 				CE041EFD1852A74100F79297 /* RFMarkdownSyntaxStorage.h */,
 				CE041EFE1852A74100F79297 /* RFMarkdownSyntaxStorage.m */,
+				CEEF0E7B184EA3FE00B7DEDF /* RFMarkdownTextView.h */,
+				CEEF0E7C184EA3FE00B7DEDF /* RFMarkdownTextView.m */,
 				61B9B94A194422B0007DB8DA /* UIPasteboard+RFMarkdown.h */,
 				61B9B94B194422B0007DB8DA /* UIPasteboard+RFMarkdown.m */,
 			);
@@ -315,6 +320,7 @@
 				F1737127184C2F5500422999 /* AppDelegate.m in Sources */,
 				CEEF0E7D184EA3FE00B7DEDF /* RFMarkdownTextView.m in Sources */,
 				F1737123184C2F5500422999 /* main.m in Sources */,
+				61FF073A199DA5DF002B4D5F /* RFMarkdownRegexMatcher.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -44,10 +44,16 @@
     return [_attributedStringBackingStore attributesAtIndex:location effectiveRange:range];
 }
 
-- (void)replaceCharactersInRange:(NSRange)range withString:(NSString*)str {
+- (void)replaceCharactersInRange:(NSRange)range withString:(NSString*)replacementString {
     [self beginEditing];
-    [_attributedStringBackingStore replaceCharactersInRange:range withString:str];
-    [self edited:NSTextStorageEditedCharacters | NSTextStorageEditedAttributes range:range changeInLength:str.length - range.length];
+
+    if (replacementString) {
+        [_attributedStringBackingStore replaceCharactersInRange:range withString:replacementString];
+    } else {
+        [_attributedStringBackingStore deleteCharactersInRange:range];
+    }
+
+    [self edited:NSTextStorageEditedCharacters | NSTextStorageEditedAttributes range:range changeInLength:replacementString.length - range.length];
     [self endEditing];
 }
 

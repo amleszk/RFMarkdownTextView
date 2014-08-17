@@ -161,7 +161,8 @@ NSString *const RFMarkdownTextTypeHelp = @"help";
 
 -(void) setText:(NSString *)text {
     [_syntaxStorage beginEditing];
-    [_syntaxStorage setAttributedString:[[NSAttributedString alloc] initWithString:text attributes:_syntaxStorage.bodyAttributes]];
+    NSAttributedString *attributedString = text ? [[NSAttributedString alloc] initWithString:text attributes:_syntaxStorage.bodyAttributes] : nil;
+    [_syntaxStorage setAttributedString:attributedString];
     [_syntaxStorage endEditing];
 }
 

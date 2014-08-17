@@ -11,6 +11,9 @@
 #import "RFToolbarButton.h"
 #import "RFMarkdownSyntaxStorage.h"
 
+extern NSString *const RFMarkdownTextTypePreview;
+extern NSString *const RFMarkdownTextTypeHelp;
+
 @protocol RFMarkdownTextViewDelegate;
 
 @interface RFMarkdownTextView : UITextView <UITextViewDelegate>
@@ -21,6 +24,7 @@
 - (void)textViewDidChange:(UITextView *)textView NS_REQUIRES_SUPER;
 
 @property (nonatomic,weak) id<RFMarkdownTextViewDelegate> markdownTextViewDelegate;
+@property (nonatomic) NSArray *excludedButtonTypes;
 
 @end
 

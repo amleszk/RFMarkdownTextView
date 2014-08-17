@@ -6,6 +6,9 @@
 //  Copyright (c) 2013 Rudd Fawcett. All rights reserved.
 //
 
+NSString *const RFMarkdownTextTypePreview = @"preview";
+NSString *const RFMarkdownTextTypeHelp = @"help";
+
 #import "RFMarkdownTextView.h"
 #import "UIPasteboard+RFMarkdown.h"
 
@@ -95,32 +98,39 @@
         [[weakSelf undoManager] undo];
     }];
 
-    UIButton *help =
-    [self createButtonWithTitle:@"Help" andEventHandler:^(id sender){
-        if ([weakSelf.markdownTextViewDelegate respondsToSelector:@selector(markdownTextView:didTapHelpWithSender:)]) {
-            [weakSelf.markdownTextViewDelegate markdownTextView:self didTapHelpWithSender:sender];
-        }
-    }];
+    NSArray *buttons = @[header,
+                          bold,
+                          italics,
+                          strike,
+                          quote,
+                          code,
+                          link,
+                          bullet,
+                          numbers,
+                          undo];
 
-    UIButton *preview =
-    [self createButtonWithTitle:@"Preview" andEventHandler:^(id sender){
-        if ([weakSelf.markdownTextViewDelegate respondsToSelector:@selector(markdownTextView:didTapPreviewWithSender:)]) {
-            [weakSelf.markdownTextViewDelegate markdownTextView:self didTapPreviewWithSender:sender];
-        }
-    }];
 
-    return @[header,
-             bold,
-             italics,
-             strike,
-             quote,
-             code,
-             link,
-             bullet,
-             numbers,
-             undo,
-             preview,
-             help];
+    if (![self.excludedButtonTypes containsObject:RFMarkdownTextTypePreview]) {
+        UIButton *preview =
+        [self createButtonWithTitle:@"Preview" andEventHandler:^(id sender){
+            if ([weakSelf.markdownTextViewDelegate respondsToSelector:@selector(markdownTextView:didTapPreviewWithSender:)]) {
+                [weakSelf.markdownTextViewDelegate markdownTextView:self didTapPreviewWithSender:sender];
+            }
+        }];
+        buttons = [buttons arrayByAddingObject:preview];
+    }
+
+    if (![self.excludedButtonTypes containsObject:RFMarkdownTextTypeHelp]) {
+        UIButton *help =
+        [self createButtonWithTitle:@"Help" andEventHandler:^(id sender){
+            if ([weakSelf.markdownTextViewDelegate respondsToSelector:@selector(markdownTextView:didTapHelpWithSender:)]) {
+                [weakSelf.markdownTextViewDelegate markdownTextView:self didTapHelpWithSender:sender];
+            }
+        }];
+        buttons = [buttons arrayByAddingObject:help];
+    }
+    
+    return buttons;
 }
 
 - (RFToolbarButton*)createButtonWithTitle:(NSString*)title andEventHandler:(void(^)())handler {

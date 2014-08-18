@@ -40,7 +40,6 @@ NSString *const RFMarkdownTextTypeHelp = @"help";
     self = [super initWithFrame:frame textContainer:container];
     if (self) {
         self.delegate = self;
-        self.inputAccessoryView = [RFKeyboardToolbar toolbarViewWithButtons:[self createMarkdownButtonsForReddit]];
     }
     return self;
 }
@@ -138,6 +137,15 @@ NSString *const RFMarkdownTextTypeHelp = @"help";
     [button addEventHandler:handler forControlEvents:UIControlEventTouchUpInside];
     
     return button;
+}
+
+#pragma mark - UIView overrides
+
+- (void)willMoveToSuperview:(UIView *)newSuperview
+{
+    if (newSuperview && !self.inputAccessoryView) {
+        self.inputAccessoryView = [RFKeyboardToolbar toolbarViewWithButtons:[self createMarkdownButtonsForReddit]];        
+    }
 }
 
 #pragma mark - UITextView overrides

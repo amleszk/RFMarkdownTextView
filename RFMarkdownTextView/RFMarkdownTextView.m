@@ -141,10 +141,10 @@ NSString *const RFMarkdownTextTypeHelp = @"help";
 
 #pragma mark - UIView overrides
 
-- (void)willMoveToSuperview:(UIView *)newSuperview
+- (void)willMoveToWindow:(UIWindow *)newWindow
 {
-    if (newSuperview && !self.inputAccessoryView) {
-        self.inputAccessoryView = [RFKeyboardToolbar toolbarViewWithButtons:[self createMarkdownButtonsForReddit]];        
+    if (newWindow) {
+        [self updateInputAccssoryView];
     }
 }
 
@@ -186,6 +186,26 @@ NSString *const RFMarkdownTextTypeHelp = @"help";
     [_syntaxStorage update];
 }
 
+#pragma mark - Toolbar handling
+
+-(void) updateInputAccssoryView
+{
+    if (!self.inputAccessoryView && self.toolbarEnabled) {
+        self.inputAccessoryView = [RFKeyboardToolbar toolbarViewWithButtons:[self createMarkdownButtonsForReddit]];
+    } else if (self.inputAccessoryView && !self.toolbarEnabled) {
+        self.inputAccessoryView = nil;
+    }
+}
+
+- (void)setToolbarEnabled:(BOOL)toolbarEnabled
+{
+    if (toolbarEnabled != _toolbarEnabled) {
+        _toolbarEnabled = toolbarEnabled;
+        if (!_toolbarEnabled) {
+            [self updateInputAccssoryView];
+        }
+    }
+}
 
 #pragma mark - Text handling
 
@@ -378,7 +398,5 @@ static NSString* const quoteMarkdown = @"> ";
     NSRange caretLineRange = NSMakeRange(caretLocationLineStart, caretLocationLineEnd-caretLocationLineStart);
     return caretLineRange;
 }
-
-#pragma mark Code block
 
 @end

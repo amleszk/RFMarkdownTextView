@@ -25,6 +25,7 @@ extern NSString *const RFMarkdownTextTypeHelp;
 
 @property (nonatomic,weak) id<RFMarkdownTextViewDelegate> markdownTextViewDelegate;
 @property (nonatomic) NSArray *excludedButtonTypes;
+@property (nonatomic) BOOL toolbarEnabled;
 
 @end
 

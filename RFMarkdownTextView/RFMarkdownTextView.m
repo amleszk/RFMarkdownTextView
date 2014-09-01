@@ -8,6 +8,7 @@
 
 NSString *const RFMarkdownTextTypePreview = @"preview";
 NSString *const RFMarkdownTextTypeHelp = @"help";
+NSString *const RFMarkdownTextTypeImageUpload = @"image_upload";
 
 #import "RFMarkdownTextView.h"
 #import "UIPasteboard+RFMarkdown.h"
@@ -108,6 +109,15 @@ NSString *const RFMarkdownTextTypeHelp = @"help";
                           numbers,
                           undo];
 
+    if (![self.excludedButtonTypes containsObject:RFMarkdownTextTypeImageUpload]) {
+        UIButton *imageUpload =
+        [self createButtonWithTitle:@"Upload image" andEventHandler:^(id sender){
+            if ([weakSelf.markdownTextViewDelegate respondsToSelector:@selector(markdownTextView:didTapImageUploadWithSender:)]) {
+                [weakSelf.markdownTextViewDelegate markdownTextView:self didTapImageUploadWithSender:sender];
+            }
+        }];
+        buttons = [buttons arrayByAddingObject:imageUpload];
+    }
 
     if (![self.excludedButtonTypes containsObject:RFMarkdownTextTypePreview]) {
         UIButton *preview =
@@ -143,6 +153,7 @@ NSString *const RFMarkdownTextTypeHelp = @"help";
 
 - (void)willMoveToWindow:(UIWindow *)newWindow
 {
+    [super willMoveToWindow:newWindow];
     if (newWindow) {
         [self updateInputAccssoryView];
     }
@@ -305,23 +316,47 @@ static NSString* const markupURLStringExample = @"http://";
 /// When selected text, surround with link markdown, when no selected text insert an example and select it. In both cases if the user has copied a valid URL it will be populated in the link section
 -(void) insertLinkMarkdown {
     __block NSString *pasteboardValidURLString = [[UIPasteboard generalPasteboard] validURLString];
+    __block BOOL offsetToMarkupExample = NO;
+    if (!pasteboardValidURLString) {
+        pasteboardValidURLString = markupURLStringExample;
+        offsetToMarkupExample = YES;
+    }
     
     [self withNoSelection:^{
         NSRange selectionRange = self.selectedRange;
-        [self insertText:[NSString stringWithFormat:@"[Click Here](%@)", pasteboardValidURLString ?: markupURLStringExample]];
+        [self insertText:[NSString stringWithFormat:@"[Click Here](%@)", pasteboardValidURLString]];
         [self offsetSelectionRange:selectionRange location:1 length:10];
         
     } orWithSelectedText:^(UITextRange *selectedTextRange, NSString *selectedText) {
-        NSString *textWithLinkFormatting = [NSString stringWithFormat:@"[%@](%@)",selectedText, pasteboardValidURLString ?: markupURLStringExample];
+        NSString *textWithLinkFormatting = [NSString stringWithFormat:@"[%@](%@)",selectedText, pasteboardValidURLString];
         NSRange selectionRange = self.selectedRange;
         [self replaceRange:selectedTextRange withText:textWithLinkFormatting];
 
-        if (pasteboardValidURLString == nil) {
+        if (offsetToMarkupExample) {
             NSUInteger newSelectionCaretLocationOffset = [textWithLinkFormatting length] - 1;
             [self offsetSelectionRange:selectionRange location:newSelectionCaretLocationOffset length:0];
         }
 
     }];
+}
+
+-(void) insertLinkMarkdownWithDescriptionText:(NSString*)descriptionText urlString:(NSString*)urlString
+{
+    NSParameterAssert(urlString);
+    if (!urlString) {
+        return;
+    }
+    
+    [self withNoSelection:^{
+        NSRange selectionRange = self.selectedRange;
+        [self insertText:[NSString stringWithFormat:@"[%@](%@)", descriptionText, urlString]];
+        [self offsetSelectionRange:selectionRange location:1 length:[descriptionText length]];
+        
+    } orWithSelectedText:^(UITextRange *selectedTextRange, NSString *selectedText) {
+        NSString *textWithLinkFormatting = [NSString stringWithFormat:@"[%@](%@)",selectedText, urlString];
+        [self replaceRange:selectedTextRange withText:textWithLinkFormatting];
+    }];
+    
 }
 
 #pragma mark Prepending to start of line

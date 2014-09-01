@@ -13,6 +13,7 @@
 
 extern NSString *const RFMarkdownTextTypePreview;
 extern NSString *const RFMarkdownTextTypeHelp;
+extern NSString *const RFMarkdownTextTypeImageUpload;
 
 @protocol RFMarkdownTextViewDelegate;
 
@@ -22,6 +23,8 @@ extern NSString *const RFMarkdownTextTypeHelp;
 - (id)initWithFrame:(CGRect)frame syntaxStorage:(RFMarkdownSyntaxStorage*)syntaxStorage;
 
 - (void)textViewDidChange:(UITextView *)textView NS_REQUIRES_SUPER;
+
+-(void) insertLinkMarkdownWithDescriptionText:(NSString*)descriptionText urlString:(NSString*)urlString;
 
 @property (nonatomic,weak) id<RFMarkdownTextViewDelegate> markdownTextViewDelegate;
 @property (nonatomic) NSArray *excludedButtonTypes;
@@ -35,5 +38,6 @@ extern NSString *const RFMarkdownTextTypeHelp;
 @optional
 -(void) markdownTextView:(RFMarkdownTextView*)markdownTextView didTapHelpWithSender:(id)sender;
 -(void) markdownTextView:(RFMarkdownTextView*)markdownTextView didTapPreviewWithSender:(id)sender;
+-(void) markdownTextView:(RFMarkdownTextView*)markdownTextView didTapImageUploadWithSender:(id)sender;
 
 @end

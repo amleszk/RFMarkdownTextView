@@ -55,6 +55,7 @@
     [syntaxStorage updateHighlightPatterns];
     
     _textView = [[RFMarkdownTextView alloc] initWithFrame:self.view.bounds syntaxStorage:syntaxStorage];
+    _textView.toolbarEnabled = YES;
     
     self.navigationItem.rightBarButtonItem =
         [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel

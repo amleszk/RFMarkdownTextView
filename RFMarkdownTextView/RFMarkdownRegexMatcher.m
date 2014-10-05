@@ -38,7 +38,7 @@
 
             @"\\s\\s\\s\\s(?:.+)" : @(RFMarkdownRegexMatchTypeCode),
             @"`(?:.+)`" : @(RFMarkdownRegexMatchTypeCode),
-            @">+(?:.+)" : @(RFMarkdownRegexMatchTypeBlockQuote),
+            @"^>+(?:.+)" : @(RFMarkdownRegexMatchTypeBlockQuote),
             
             @"(\\[\\w+(\\s\\w+)*\\]\\(\\w+\\w[/[\\.,-\\/#!?@$%\\^&\\*;:|{}<>+=\\-'_~()\\\"\\[\\]\\\\]/ \\w+]*\\))" : @(RFMarkdownRegexMatchTypeLink)
         };

@@ -26,6 +26,8 @@ extern NSString *const RFMarkdownTextTypeImageUpload;
 
 -(void) insertLinkMarkdownWithDescriptionText:(NSString*)descriptionText urlString:(NSString*)urlString;
 
+-(void) updateInputAccessoryView;
+
 @property (nonatomic,weak) id<RFMarkdownTextViewDelegate> markdownTextViewDelegate;
 @property (nonatomic) NSArray *excludedButtonTypes;
 @property (nonatomic) BOOL toolbarEnabled;

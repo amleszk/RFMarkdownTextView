@@ -155,7 +155,7 @@ NSString *const RFMarkdownTextTypeImageUpload = @"image_upload";
 {
     [super willMoveToWindow:newWindow];
     if (newWindow) {
-        [self updateInputAccssoryView];
+        [self updateInputAccessoryView];
     }
 }
 
@@ -199,7 +199,7 @@ NSString *const RFMarkdownTextTypeImageUpload = @"image_upload";
 
 #pragma mark - Toolbar handling
 
--(void) updateInputAccssoryView
+-(void) updateInputAccessoryView
 {
     if (!self.inputAccessoryView && self.toolbarEnabled) {
         self.inputAccessoryView = [RFKeyboardToolbar toolbarViewWithButtons:[self createMarkdownButtonsForReddit]];
@@ -213,7 +213,7 @@ NSString *const RFMarkdownTextTypeImageUpload = @"image_upload";
     if (toolbarEnabled != _toolbarEnabled) {
         _toolbarEnabled = toolbarEnabled;
         if (!_toolbarEnabled) {
-            [self updateInputAccssoryView];
+            [self updateInputAccessoryView];
         }
     }
 }
